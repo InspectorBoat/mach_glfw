@@ -1,0 +1,20 @@
+.{
+    .name = .mach_glfw,
+    .version = "0.2.0",
+    .fingerprint = 0xa924846dbd8ccb1c,
+    .paths = .{
+        "src/",
+        "build.zig",
+        "build.zig.zon",
+        "LICENSE",
+        "LICENSE-APACHE",
+        "LICENSE-MIT",
+        "README.md",
+    },
+    .dependencies = .{
+        .glfw = .{
+            .url = "https://pkg.machengine.org/glfw/ec656e10d3643a3a71149bb96ae6b0831b84b677.tar.gz",
+            .hash = "12207be469bad84baed2ede75cf89ede37e1ed5ee8be62a54d2b2112c5f56a44cc89",
+        },
+    },
+}
