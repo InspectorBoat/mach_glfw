@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    var module = b.addModule("mach-glfw", .{
+    var module = b.addModule("mach_glfw", .{
         .target = target,
         .optimize = optimize,
         .root_source_file = b.path("src/main.zig"),
@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) !void {
 
     const test_step = b.step("test", "Run library tests");
     const main_tests = b.addTest(.{
-        .name = "glfw-tests",
+        .name = "glfw_tests",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,

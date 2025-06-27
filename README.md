@@ -16,6 +16,8 @@ Perfected GLFW bindings for Zig, with 100% API coverage, zero-fuss installation,
 
 The [Mach engine](https://machengine.org/) project no longer uses GLFW, and so this project became community-maintained and moved to a personal github account. Said github account later got deleted. This old version was pulled from https://pkg.machengine.org/mach-glfw/affdd6ae6f2ac2c3b9162784bdad345c561eeeea.tar.gz, made to work on the latest zig, and reuploaded.
 
+Since Zig now requires package names to be valid bare identifiers, the name was changed to mach_glfw.
+
 Some old documentation is available at https://machengine.org/v0.4/pkg/mach-glfw/ (most of which is replicated below).
 
 ## What does a ziggified GLFW API offer?
@@ -54,11 +56,11 @@ Add the following to your `build.zig` below your `const exe = b.addExecutable(..
 
 ```zig
     // Use mach-glfw
-    const glfw_dep = b.dependency("mach-glfw", .{
+    const glfw_dep = b.dependency("mach_glfw", .{
         .target = target,
         .optimize = optimize,
     });
-    exe.root_module.addImport("mach-glfw", glfw_dep.module("mach-glfw"));
+    exe.root_module.addImport("mach_glfw", glfw_dep.module("mach_glfw"));
 ```
 
 ### `src/main.zig`
@@ -67,7 +69,7 @@ Here’s an example program to get you started:
 
 ```zig
 const std = @import("std");
-const glfw = @import("mach-glfw");
+const glfw = @import("mach_glfw");
 
 /// Default GLFW error handling callback
 fn errorCallback(error_code: glfw.ErrorCode, description: [:0]const u8) void {
@@ -83,7 +85,7 @@ pub fn main() !void {
     defer glfw.terminate();
 
     // Create our window
-    const window = glfw.Window.create(640, 480, "Hello, mach-glfw!", null, null, .{}) orelse {
+    const window = glfw.Window.create(640, 480, "Hello, mach_glfw!", null, null, .{}) orelse {
         std.log.err("failed to create GLFW window: {?s}", .{glfw.getErrorString()});
         std.process.exit(1);
     };
