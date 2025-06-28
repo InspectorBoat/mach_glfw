@@ -13,8 +13,8 @@
     },
     .dependencies = .{
         .glfw = .{
-            .url = "git+https://github.com/InspectorBoat/glfw#a3982e05e8e1b54a2c44ab0320f8fd922f2f6ab7",
-            .hash = "glfw-0.0.0-C6hOfkkiGgAVCbcJl5dSfi_smo1u6QhLC92Un1Jw9sTr",
+            .url = "git+https://github.com/InspectorBoat/glfw#dc756f5f213cf07bc08be200680f205232161da8",
+            .hash = "glfw-0.0.0-C6hOfoUiGgCnLdF3h_jTkgx-9MedJGuW0InQbbXp1wjh",
         },
     },
 }
