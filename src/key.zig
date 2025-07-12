@@ -153,6 +153,11 @@ pub const Key = enum(c_int) {
         return @as(Key, @enumFromInt(cc.GLFW_KEY_LAST));
     }
 
+    pub inline fn number(n: usize) Key {
+        std.debug.assert(n <= 9);
+        return @enumFromInt(@intFromEnum(Key.zero) + n);
+    }
+
     /// Returns the layout-specific name of the specified printable key.
     ///
     /// This function returns the name of the specified printable key, encoded as UTF-8. This is
@@ -263,4 +268,17 @@ test "getScancode" {
     defer glfw.terminate();
 
     _ = glfw.Key.a.getScancode();
+}
+
+test "number" {
+    try std.testing.expectEqual(Key.zero, Key.number(0));
+    try std.testing.expectEqual(Key.one, Key.number(1));
+    try std.testing.expectEqual(Key.two, Key.number(2));
+    try std.testing.expectEqual(Key.three, Key.number(3));
+    try std.testing.expectEqual(Key.four, Key.number(4));
+    try std.testing.expectEqual(Key.five, Key.number(5));
+    try std.testing.expectEqual(Key.six, Key.number(6));
+    try std.testing.expectEqual(Key.seven, Key.number(7));
+    try std.testing.expectEqual(Key.eight, Key.number(8));
+    try std.testing.expectEqual(Key.nine, Key.number(9));
 }
