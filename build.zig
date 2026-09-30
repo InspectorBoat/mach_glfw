@@ -20,11 +20,13 @@ pub fn build(b: *std.Build) !void {
     const test_step = b.step("test", "Run library tests");
     const main_tests = b.addTest(.{
         .name = "glfw_tests",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+            .root_source_file = b.path("src/main.zig"),
+        }),
     });
-    main_tests.linkLibrary(glfw_dep.artifact("glfw"));
+    main_tests.root_module.linkLibrary(glfw_dep.artifact("glfw"));
     b.installArtifact(main_tests);
     test_step.dependOn(&b.addRunArtifact(main_tests).step);
 
