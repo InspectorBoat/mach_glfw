@@ -2,7 +2,7 @@
 
 const testing = @import("std").testing;
 const mem = @import("std").mem;
-const c = @import("c.zig").c;
+const c = @import("c");
 
 /// Errors that GLFW can produce.
 pub const ErrorCode = error{

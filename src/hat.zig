@@ -1,4 +1,4 @@
-const c = @import("c.zig").c;
+const c = @import("c");
 
 // must be in sync with GLFW C constants in hat state group, search for "@defgroup hat_state Joystick hat states"
 /// A bitmask of all Joystick hat states

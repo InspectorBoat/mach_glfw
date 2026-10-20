@@ -10,10 +10,21 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
+    const c = b.addTranslateC(.{
+        .root_source_file = b.path("src/c.c"),
+        .target = target,
+        .optimize = optimize,
+    });
+    c.addIncludePath(glfw_dep.artifact("glfw").getEmittedIncludeTree());
+    const c_mod = c.createModule();
+
     var module = b.addModule("mach_glfw", .{
         .target = target,
         .optimize = optimize,
         .root_source_file = b.path("src/main.zig"),
+        .imports = &.{
+            .{ .name = "c", .module = c_mod },
+        },
     });
     module.linkLibrary(glfw_dep.artifact("glfw"));
 
@@ -24,6 +35,9 @@ pub fn build(b: *std.Build) !void {
             .target = target,
             .optimize = optimize,
             .root_source_file = b.path("src/main.zig"),
+            .imports = &.{
+                .{ .name = "c", .module = c_mod },
+            },
         }),
     });
     main_tests.root_module.linkLibrary(glfw_dep.artifact("glfw"));

@@ -1,4 +1,4 @@
-const c = @import("c.zig").c;
+const c = @import("c");
 
 /// Key and button actions
 pub const Action = enum(c_int) {

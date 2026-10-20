@@ -3,7 +3,7 @@
 const std = @import("std");
 const mem = std.mem;
 const testing = std.testing;
-const c = @import("c.zig").c;
+const c = @import("c");
 
 const GammaRamp = @import("GammaRamp.zig");
 const VideoMode = @import("VideoMode.zig");
@@ -392,7 +392,7 @@ pub inline fn setCallback(comptime callback: ?fn (monitor: Monitor, event: Event
             pub fn monitorCallbackWrapper(monitor: ?*c.GLFWmonitor, event: c_int) callconv(.c) void {
                 @call(.always_inline, user_callback, .{
                     Monitor{ .handle = monitor.? },
-                    @as(Event, @enumFromInt(event)),
+                    @as(Event, @fromBackingInt(@intCast(event))),
                 });
             }
         };

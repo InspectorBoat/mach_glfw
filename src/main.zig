@@ -1,7 +1,7 @@
 const std = @import("std");
 const testing = std.testing;
 
-const c = @import("c.zig").c;
+const c = @import("c");
 
 const key = @import("key.zig");
 const errors = @import("errors.zig");
@@ -118,7 +118,7 @@ pub inline fn init(hints: InitHints) bool {
         const init_hint = @field(InitHint, field_name);
         const init_value = @field(hints, field_name);
         if (@TypeOf(init_value) == PlatformType) {
-            initHint(init_hint, @intFromEnum(init_value));
+            initHint(init_hint, @backingInt(init_value));
         } else {
             initHint(init_hint, init_value);
         }
@@ -305,9 +305,9 @@ pub const PlatformType = enum(c_int) {
 fn initHint(hint: InitHint, value: anytype) void {
     switch (@import("shims.zig").typeInfo(@TypeOf(value))) {
         .int, .comptime_int => {
-            c.glfwInitHint(@intFromEnum(hint), @as(c_int, @intCast(value)));
+            c.glfwInitHint(@backingInt(hint), @as(c_int, @intCast(value)));
         },
-        .bool => c.glfwInitHint(@intFromEnum(hint), @as(c_int, @intCast(@intFromBool(value)))),
+        .bool => c.glfwInitHint(@backingInt(hint), @as(c_int, @intCast(@intFromBool(value)))),
         else => @compileError("expected a int or bool, got " ++ @typeName(@TypeOf(value))),
     }
 }
@@ -345,7 +345,7 @@ pub inline fn getVersionString() [:0]const u8 {
 /// thread_safety: This function may be called from any thread.
 pub fn getPlatform() PlatformType {
     internal_debug.assertInitialized();
-    return @as(PlatformType, @enumFromInt(c.glfwGetPlatform()));
+    return @as(PlatformType, @fromBackingInt(@intCast(c.glfwGetPlatform())));
 }
 
 /// Returns whether the library includes support for the specified platform.
@@ -359,7 +359,7 @@ pub fn getPlatform() PlatformType {
 /// thread_safety: This function may be called from any thread.
 pub fn platformSupported(platform: PlatformType) bool {
     internal_debug.assertInitialized();
-    return c.glfwPlatformSupported(@intFromEnum(platform)) == c.GLFW_TRUE;
+    return c.glfwPlatformSupported(@backingInt(platform)) == c.GLFW_TRUE;
 }
 
 /// Processes all pending events.
@@ -520,14 +520,14 @@ pub fn basicTest() !void {
     };
     defer window.destroy();
 
-    const start = std.time.milliTimestamp();
-    while (std.time.milliTimestamp() < start + 1000 and !window.shouldClose()) {
+    const start = std.Io.Timestamp.now(std.testing.io, .real);
+    while (start.untilNow(std.testing.io, .real).toMilliseconds() < 1000 and !window.shouldClose()) {
         c.glfwPollEvents();
     }
 }
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 test "getVersionString" {
@@ -538,7 +538,7 @@ test "getVersionString" {
 test "init" {
     _ = init(.{ .cocoa_chdir_resources = true });
     if (getErrorString()) |err| {
-        std.log.err("failed to initialize GLFW: {?s}", .{err});
+        std.log.err("failed to initialize GLFW: {s}", .{err});
         std.process.exit(1);
     }
     defer terminate();

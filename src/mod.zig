@@ -2,7 +2,7 @@
 //!
 //! See glfw.setKeyCallback for how these are used.
 
-const c = @import("c.zig").c;
+const c = @import("c");
 
 // must be in sync with GLFW C constants in modifier group, search for "@defgroup mods Modifier key flags"
 /// A bitmask of all key modifiers

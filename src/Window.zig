@@ -3,7 +3,7 @@
 const std = @import("std");
 const testing = std.testing;
 const mem = std.mem;
-const c = @import("c.zig").c;
+const c = @import("c");
 
 const glfw = @import("main.zig");
 const Image = @import("Image.zig");
@@ -133,8 +133,8 @@ pub const Hints = struct {
     transparent_framebuffer: bool = false,
     focus_on_show: bool = true,
     mouse_passthrough: bool = false,
-    position_x: c_int = @intFromEnum(Position.any),
-    position_y: c_int = @intFromEnum(Position.any),
+    position_x: c_int = @backingInt(Position.any),
+    position_y: c_int = @backingInt(Position.any),
 
     scale_to_monitor: bool = false,
 
@@ -252,7 +252,7 @@ pub const Hints = struct {
     fn set(hints: Hints) void {
         internal_debug.assertInitialized();
         inline for (comptime std.meta.fieldNames(Hint)) |field_name| {
-            const hint_tag = @intFromEnum(@field(Hint, field_name));
+            const hint_tag = @backingInt(@field(Hint, field_name));
             const hint_value = @field(hints, field_name);
             switch (@TypeOf(hint_value)) {
                 bool => c.glfwWindowHint(hint_tag, @intFromBool(hint_value)),
@@ -265,7 +265,7 @@ pub const Hints = struct {
                 ContextReleaseBehavior,
                 OpenGLProfile,
                 Position,
-                => c.glfwWindowHint(hint_tag, @intFromEnum(hint_value)),
+                => c.glfwWindowHint(hint_tag, @backingInt(hint_value)),
 
                 [:0]const u8 => c.glfwWindowHintString(hint_tag, hint_value.ptr),
 
@@ -1134,7 +1134,7 @@ pub const Attrib = enum(c_int) {
 /// see also: window_attribs, glfw.Window.setAttrib
 pub inline fn getAttrib(self: Window, attrib: Attrib) i32 {
     internal_debug.assertInitialized();
-    return c.glfwGetWindowAttrib(self.handle, @intFromEnum(attrib));
+    return c.glfwGetWindowAttrib(self.handle, @backingInt(attrib));
 }
 
 /// Sets an attribute of the specified window.
@@ -1175,7 +1175,7 @@ pub inline fn setAttrib(self: Window, attrib: Attrib, value: bool) void {
         => true,
         else => false,
     });
-    c.glfwSetWindowAttrib(self.handle, @intFromEnum(attrib), if (value) c.GLFW_TRUE else c.GLFW_FALSE);
+    c.glfwSetWindowAttrib(self.handle, @backingInt(attrib), if (value) c.GLFW_TRUE else c.GLFW_FALSE);
 }
 
 /// Sets the user pointer of the specified window.
@@ -1566,7 +1566,7 @@ pub inline fn setInputModeCursor(self: Window, value: InputModeCursor) void {
 
 /// Gets the current input mode of the cursor.
 pub inline fn getInputModeCursor(self: Window) InputModeCursor {
-    return @as(InputModeCursor, @enumFromInt(self.getInputMode(InputMode.cursor)));
+    return @as(InputModeCursor, @fromBackingInt(@intCast(self.getInputMode(InputMode.cursor))));
 }
 
 /// Sets the input mode of sticky keys, if enabled a key press will ensure that `glfw.Window.getKey`
@@ -1647,7 +1647,7 @@ pub inline fn getInputModeRawMouseMotion(self: Window) bool {
 /// see also: glfw.Window.setInputMode
 pub inline fn getInputMode(self: Window, mode: InputMode) i32 {
     internal_debug.assertInitialized();
-    const value = c.glfwGetInputMode(self.handle, @intFromEnum(mode));
+    const value = c.glfwGetInputMode(self.handle, @backingInt(mode));
     return @as(i32, @intCast(value));
 }
 
@@ -1685,10 +1685,10 @@ pub inline fn setInputMode(self: Window, mode: InputMode, value: anytype) void {
     const int_value: c_int = switch (@import("shims.zig").typeInfo(T)) {
         .@"enum",
         .enum_literal,
-        => @intFromEnum(@as(InputModeCursor, value)),
+        => @backingInt(@as(InputModeCursor, value)),
         else => @intFromBool(value),
     };
-    c.glfwSetInputMode(self.handle, @intFromEnum(mode), int_value);
+    c.glfwSetInputMode(self.handle, @backingInt(mode), int_value);
 }
 
 /// Returns the last reported press state of a keyboard key for the specified window.
@@ -1718,8 +1718,8 @@ pub inline fn setInputMode(self: Window, mode: InputMode, value: anytype) void {
 /// see also: input_key
 pub inline fn getKey(self: Window, key: Key) Action {
     internal_debug.assertInitialized();
-    const state = c.glfwGetKey(self.handle, @intFromEnum(key));
-    return @as(Action, @enumFromInt(state));
+    const state = c.glfwGetKey(self.handle, @backingInt(key));
+    return @as(Action, @fromBackingInt(@intCast(state)));
 }
 
 /// Returns the last reported state of a mouse button for the specified window.
@@ -1740,8 +1740,8 @@ pub inline fn getKey(self: Window, key: Key) Action {
 /// see also: input_mouse_button
 pub inline fn getMouseButton(self: Window, button: MouseButton) Action {
     internal_debug.assertInitialized();
-    const state = c.glfwGetMouseButton(self.handle, @intFromEnum(button));
-    return @as(Action, @enumFromInt(state));
+    const state = c.glfwGetMouseButton(self.handle, @backingInt(button));
+    return @as(Action, @fromBackingInt(@intCast(state)));
 }
 
 pub const CursorPos = struct {
@@ -1874,9 +1874,9 @@ pub inline fn setKeyCallback(self: Window, comptime callback: ?fn (window: Windo
             pub fn keyCallbackWrapper(handle: ?*c.GLFWwindow, key: c_int, scancode: c_int, action: c_int, mods: c_int) callconv(.c) void {
                 @call(.always_inline, user_callback, .{
                     from(handle.?),
-                    @as(Key, @enumFromInt(key)),
+                    @as(Key, @fromBackingInt(@intCast(key))),
                     @as(i32, @intCast(scancode)),
-                    @as(Action, @enumFromInt(action)),
+                    @as(Action, @fromBackingInt(@intCast(action))),
                     Mods.fromInt(mods),
                 });
             }
@@ -1961,8 +1961,8 @@ pub inline fn setMouseButtonCallback(self: Window, comptime callback: ?fn (windo
             pub fn mouseButtonCallbackWrapper(handle: ?*c.GLFWwindow, button: c_int, action: c_int, mods: c_int) callconv(.c) void {
                 @call(.always_inline, user_callback, .{
                     from(handle.?),
-                    @as(MouseButton, @enumFromInt(button)),
-                    @as(Action, @enumFromInt(action)),
+                    @as(MouseButton, @fromBackingInt(@intCast(button))),
+                    @as(Action, @fromBackingInt(@intCast(action))),
                     Mods.fromInt(mods),
                 });
             }
@@ -2151,21 +2151,21 @@ inline fn hint(h: Hint, value: anytype) void {
 
     switch (value_type_info) {
         .int, .comptime_int => {
-            c.glfwWindowHint(@intFromEnum(h), @as(c_int, @intCast(value)));
+            c.glfwWindowHint(@backingInt(h), @as(c_int, @intCast(value)));
         },
         .bool => {
             const int_value = @intFromBool(value);
-            c.glfwWindowHint(@intFromEnum(h), @as(c_int, @intCast(int_value)));
+            c.glfwWindowHint(@backingInt(h), @as(c_int, @intCast(int_value)));
         },
         .@"enum" => {
-            const int_value = @intFromEnum(value);
-            c.glfwWindowHint(@intFromEnum(h), @as(c_int, @intCast(int_value)));
+            const int_value = @backingInt(value);
+            c.glfwWindowHint(@backingInt(h), @as(c_int, @intCast(int_value)));
         },
         .array => |arr_type| {
             if (arr_type.child != u8) {
                 @compileError("expected array of u8, got " ++ @typeName(arr_type));
             }
-            c.glfwWindowHintString(@intFromEnum(h), &value[0]);
+            c.glfwWindowHintString(@backingInt(h), &value[0]);
         },
         .pointer => |pointer_info| {
             const pointed_type = @import("shims.zig").typeInfo(pointer_info.child);
@@ -2178,7 +2178,7 @@ inline fn hint(h: Hint, value: anytype) void {
                 else => @compileError("expected pointer to array, got " ++ @typeName(pointed_type)),
             }
 
-            c.glfwWindowHintString(@intFromEnum(h), &value[0]);
+            c.glfwWindowHintString(@backingInt(h), &value[0]);
         },
         else => {
             @compileError("expected a int, bool, enum, array, or pointer, got " ++ @typeName(value_type));

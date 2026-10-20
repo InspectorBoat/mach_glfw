@@ -1,7 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const c = @import("c.zig").c;
+const c = @import("c");
 const Window = @import("Window.zig");
 
 const internal_debug = @import("internal_debug.zig");

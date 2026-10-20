@@ -1,7 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const c = @import("c.zig").c;
+const c = @import("c");
 const Window = @import("Window.zig");
 
 const internal_debug = @import("internal_debug.zig");
@@ -94,7 +94,7 @@ pub inline fn getRequiredInstanceExtensions() ?[][*:0]const u8 {
 /// Generic function pointer used for returning Vulkan API function pointers.
 ///
 /// see also: vulkan_proc, glfw.getInstanceProcAddress
-pub const VKProc = *const fn () callconv(if (builtin.os.tag == .windows and builtin.cpu.arch == .x86) .Stdcall else .C) void;
+pub const VKProc = *const fn () callconv(if (builtin.os.tag == .windows and builtin.cpu.arch == .x86) .Stdcall else .c) void;
 
 /// Returns the address of the specified Vulkan instance function.
 ///
@@ -232,7 +232,7 @@ pub inline fn createWindowSurface(vk_instance: anytype, window: Window, vk_alloc
     // zig-vulkan uses enums to represent opaque pointers:
     // pub const Instance = enum(usize) { null_handle = 0, _ };
     const instance: c.VkInstance = switch (@import("shims.zig").typeInfo(@TypeOf(vk_instance))) {
-        .@"enum" => @as(c.VkInstance, @ptrFromInt(@intFromEnum(vk_instance))),
+        .@"enum" => @as(c.VkInstance, @ptrFromInt(@backingInt(vk_instance))),
         else => @as(c.VkInstance, @ptrCast(vk_instance)),
     };
 

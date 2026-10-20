@@ -1,6 +1,6 @@
 //! GLFW version info
 
-const c = @import("c.zig").c;
+const c = @import("c");
 
 /// The major version number of the GLFW library.
 ///

@@ -16,7 +16,7 @@
 
 const std = @import("std");
 
-const cc = @import("c.zig").c;
+const cc = @import("c");
 
 const internal_debug = @import("internal_debug.zig");
 
@@ -150,12 +150,12 @@ pub const Key = enum(c_int) {
     menu = cc.GLFW_KEY_MENU,
 
     pub inline fn last() Key {
-        return @as(Key, @enumFromInt(cc.GLFW_KEY_LAST));
+        return @as(Key, @fromBackingInt(@intCast(cc.GLFW_KEY_LAST)));
     }
 
     pub inline fn number(n: usize) Key {
         std.debug.assert(n <= 9);
-        return @enumFromInt(@intFromEnum(Key.zero) + n);
+        return @fromBackingInt(@intCast(@backingInt(Key.zero) + n));
     }
 
     /// Returns the layout-specific name of the specified printable key.
@@ -220,7 +220,7 @@ pub const Key = enum(c_int) {
     /// see also: input_key_name
     pub inline fn getName(self: Key, scancode: i32) ?[:0]const u8 {
         internal_debug.assertInitialized();
-        const name_opt = cc.glfwGetKeyName(@intFromEnum(self), @as(c_int, @intCast(scancode)));
+        const name_opt = cc.glfwGetKeyName(@backingInt(self), @as(c_int, @intCast(scancode)));
         return if (name_opt) |name|
             std.mem.span(@as([*:0]const u8, @ptrCast(name)))
         else
@@ -242,7 +242,7 @@ pub const Key = enum(c_int) {
     /// @thread_safety This function may be called from any thread.
     pub inline fn getScancode(self: Key) i32 {
         internal_debug.assertInitialized();
-        return cc.glfwGetKeyScancode(@intFromEnum(self));
+        return cc.glfwGetKeyScancode(@backingInt(self));
     }
 };
 

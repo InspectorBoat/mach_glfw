@@ -3,7 +3,7 @@
 const std = @import("std");
 const testing = std.testing;
 
-const c = @import("c.zig").c;
+const c = @import("c");
 const Image = @import("Image.zig");
 
 const internal_debug = @import("internal_debug.zig");
@@ -153,7 +153,7 @@ pub inline fn create(image: Image, xhot: i32, yhot: i32) ?Cursor {
 /// see also: cursor_object, glfwCreateCursor
 pub inline fn createStandard(shape: Shape) ?Cursor {
     internal_debug.assertInitialized();
-    if (c.glfwCreateStandardCursor(@as(c_int, @intCast(@intFromEnum(shape))))) |cursor| return Cursor{ .ptr = cursor };
+    if (c.glfwCreateStandardCursor(@as(c_int, @intCast(@backingInt(shape))))) |cursor| return Cursor{ .ptr = cursor };
     return null;
 }
 

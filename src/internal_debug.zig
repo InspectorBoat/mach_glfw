@@ -1,7 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const is_debug = builtin.mode == .Debug;
+const is_debug = builtin.mode == .debug;
 var glfw_initialized = if (is_debug) false else @as(void, {});
 pub inline fn toggleInitialized() void {
     if (is_debug) glfw_initialized = !glfw_initialized;
